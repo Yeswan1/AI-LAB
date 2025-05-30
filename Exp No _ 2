@@ -1,0 +1,42 @@
+def is_safe(board, row, col):
+    for i in range(row):
+        if board[i] == col or \
+           board[i] - i == col - row or \
+           board[i] + i == col + row:
+            return False
+    return True
+
+def solve_n_queens(n):
+    def solve(row, board, solutions):
+        if row == n:
+            solutions.append(board[:])
+            return
+        for col in range(n):
+            if is_safe(board, row, col):
+                board[row] = col
+                solve(row + 1, board, solutions)
+                board[row] = -1
+
+    board = [-1] * n
+    solutions = []
+    solve(0, board, solutions)
+    return solutions
+
+def print_solutions(solutions, n):
+    for idx, sol in enumerate(solutions):
+        print(f"Solution {idx + 1}:")
+        for row in sol:
+            line = ['Q' if i == row else '.' for i in range(n)]
+            print(' '.join(line))
+        print()
+
+if __name__ == "__main__":
+    try:
+        n = int(input("Enter the number of queens (N): "))
+        if n < 1:
+            raise ValueError("N must be a positive integer.")
+        solutions = solve_n_queens(n)
+        print(f"Total solutions for {n}-Queens: {len(solutions)}")
+        print_solutions(solutions, n)
+    except Exception as e:
+        print("Error:", e)

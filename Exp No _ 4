@@ -1,0 +1,45 @@
+import itertools
+
+def is_valid(puzzle, mapping):
+    def word_to_number(word):
+        return int(''.join(str(mapping[c]) for c in word))
+
+    left, result = puzzle
+    left_sum = sum(word_to_number(word) for word in left)
+    result_value = word_to_number(result)
+    return left_sum == result_value
+
+def solve_crypt_arithmetic(left_words, result_word):
+    letters = set(''.join(left_words + [result_word]))
+    if len(letters) > 10:
+        print("Too many unique letters (more than 10).")
+        return
+
+    first_letters = set(word[0] for word in left_words + [result_word])
+    letters = list(letters)
+
+    for perm in itertools.permutations(range(10), len(letters)):
+        mapping = dict(zip(letters, perm))
+        if any(mapping[fl] == 0 for fl in first_letters):
+            continue
+
+        if is_valid((left_words, result_word), mapping):
+            print("Solution:")
+            for k in sorted(mapping):
+                print(f"{k} = {mapping[k]}")
+            return
+
+    print("No solution found.")
+
+if __name__ == "__main__":
+    try:
+        puzzle_input = input("Enter the puzzle (e.g., SEND + MORE = MONEY): ").replace(' ', '')
+        if '=' not in puzzle_input or '+' not in puzzle_input:
+            raise ValueError("Invalid format. Use format: WORD1 + WORD2 = RESULT")
+
+        left_part, result_word = puzzle_input.split('=')
+        left_words = left_part.split('+')
+
+        solve_crypt_arithmetic(left_words, result_word)
+    except Exception as e:
+        print("Error:", e)

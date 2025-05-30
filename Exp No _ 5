@@ -1,0 +1,53 @@
+from collections import deque
+
+def is_valid(state):
+    m1, c1, boat, m2, c2 = state
+    if m1 < 0 or c1 < 0 or m2 < 0 or c2 < 0:
+        return False
+    if (m1 and m1 < c1) or (m2 and m2 < c2):
+        return False
+    return True
+
+def get_successors(state):
+    m1, c1, boat, m2, c2 = state
+    successors = []
+    moves = [(1,0), (2,0), (0,1), (0,2), (1,1)]
+
+    for m, c in moves:
+        if boat == 1:
+            new_state = (m1 - m, c1 - c, 0, m2 + m, c2 + c)
+        else:
+            new_state = (m1 + m, c1 + c, 1, m2 - m, c2 - c)
+        if is_valid(new_state):
+            successors.append(new_state)
+    return successors
+
+def solve():
+    start = (3, 3, 1, 0, 0)
+    goal = (0, 0, 0, 3, 3)
+    visited = set()
+    queue = deque()
+    queue.append((start, [start]))
+
+    while queue:
+        state, path = queue.popleft()
+        if state == goal:
+            return path
+        for succ in get_successors(state):
+            if succ not in visited:
+                visited.add(succ)
+                queue.append((succ, path + [succ]))
+    return None
+
+def print_solution(path):
+    for i, state in enumerate(path):
+        m1, c1, boat, m2, c2 = state
+        print(f"Step {i}: Left -> M: {m1}, C: {c1} | Boat: {'Left' if boat == 1 else 'Right'} | Right -> M: {m2}, C: {c2}")
+
+if __name__ == "__main__":
+    path = solve()
+    if path:
+        print("Solution Found:")
+        print_solution(path)
+    else:
+        print("No solution found.")

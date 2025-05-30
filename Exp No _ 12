@@ -1,0 +1,59 @@
+def print_board(board):
+    print()
+    for row in board:
+        print(" | ".join(row))
+        print("-" * 5)
+    print()
+
+def check_win(board, player):
+    # Check rows, columns and diagonals
+    for i in range(3):
+        if all([cell == player for cell in board[i]]) or all([board[j][i] == player for j in range(3)]):
+            return True
+    if board[0][0] == board[1][1] == board[2][2] == player or \
+       board[0][2] == board[1][1] == board[2][0] == player:
+        return True
+    return False
+
+def check_draw(board):
+    return all(cell in ['X', 'O'] for row in board for cell in row)
+
+def get_move(player, board):
+    while True:
+        try:
+            move = int(input(f"Player {player}, enter your move (1-9): ")) - 1
+            row, col = divmod(move, 3)
+            if move < 0 or move > 8:
+                print("Invalid move. Please choose a number between 1 and 9.")
+            elif board[row][col] in ['X', 'O']:
+                print("Cell already taken. Choose another.")
+            else:
+                return row, col
+        except ValueError:
+            print("Invalid input. Enter a number between 1 and 9.")
+
+def main():
+    board = [['1', '2', '3'],
+             ['4', '5', '6'],
+             ['7', '8', '9']]
+    
+    current_player = 'X'
+
+    while True:
+        print_board(board)
+        row, col = get_move(current_player, board)
+        board[row][col] = current_player
+
+        if check_win(board, current_player):
+            print_board(board)
+            print(f"Player {current_player} wins!")
+            break
+        elif check_draw(board):
+            print_board(board)
+            print("It's a draw!")
+            break
+
+        current_player = 'O' if current_player == 'X' else 'X'
+
+if __name__ == "__main__":
+    main()

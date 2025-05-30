@@ -1,0 +1,59 @@
+def is_consistent(assignment, var, value, constraints):
+    for (var1, var2), constraint in constraints.items():
+        if var == var1 and var2 in assignment:
+            if not constraint(value, assignment[var2]):
+                return False
+        if var == var2 and var1 in assignment:
+            if not constraint(assignment[var1], value):
+                return False
+    return True
+
+def backtrack(assignment, variables, domains, constraints):
+    if len(assignment) == len(variables):
+        return assignment
+
+    var = next(v for v in variables if v not in assignment)
+    for value in domains[var]:
+        if is_consistent(assignment, var, value, constraints):
+            assignment[var] = value
+            result = backtrack(assignment, variables, domains, constraints)
+            if result:
+                return result
+            del assignment[var]
+    return None
+
+def main():
+    n = int(input("Enter number of variables: "))
+    variables = []
+    domains = {}
+    constraints = {}
+
+    print("\n--- Enter variables and domains ---")
+    for _ in range(n):
+        var = input("Variable name: ")
+        variables.append(var)
+        domain = input(f"Enter domain for {var} (comma separated): ").split(",")
+        domains[var] = domain
+
+    print("\n--- Define binary constraints ---")
+    m = int(input("Enter number of binary constraints: "))
+    for _ in range(m):
+        var1 = input("First variable: ")
+        var2 = input("Second variable: ")
+        expr = input(f"Enter constraint as lambda x, y: (e.g., x != y): ")
+        try:
+            constraint_fn = eval(f"lambda x, y: {expr}")
+            constraints[(var1, var2)] = constraint_fn
+        except:
+            print("Invalid constraint. Try again.")
+            continue
+
+    print("\nSolving CSP...")
+    result = backtrack({}, variables, domains, constraints)
+    if result:
+        print("Solution found:", result)
+    else:
+        print("No solution found.")
+
+if __name__ == "__main__":
+    main()

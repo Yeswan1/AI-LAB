@@ -1,0 +1,73 @@
+import heapq
+
+class Node:
+    def __init__(self, position, parent=None):
+        self.position = position  # (row, col)
+        self.parent = parent
+        self.g = 0  # Distance from start node
+        self.h = 0  # Heuristic (Manhattan distance)
+        self.f = 0  # Total cost
+
+    def __lt__(self, other):
+        return self.f < other.f
+
+def heuristic(a, b):
+    # Manhattan distance
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+def a_star(grid, start, end):
+    open_set = []
+    start_node = Node(start)
+    end_node = Node(end)
+    heapq.heappush(open_set, start_node)
+    closed_set = set()
+
+    while open_set:
+        current_node = heapq.heappop(open_set)
+
+        if current_node.position == end_node.position:
+            # Reconstruct path
+            path = []
+            while current_node:
+                path.append(current_node.position)
+                current_node = current_node.parent
+            return path[::-1]
+
+        closed_set.add(current_node.position)
+
+        # Explore neighbors (up, down, left, right)
+        for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)]:
+            x, y = current_node.position[0] + dx, current_node.position[1] + dy
+
+            if 0 <= x < len(grid) and 0 <= y < len(grid[0]) and grid[x][y] == 0:
+                neighbor_pos = (x, y)
+                if neighbor_pos in closed_set:
+                    continue
+
+                neighbor = Node(neighbor_pos, current_node)
+                neighbor.g = current_node.g + 1
+                neighbor.h = heuristic(neighbor_pos, end_node.position)
+                neighbor.f = neighbor.g + neighbor.h
+
+                # Check if a better path exists
+                if not any(n.position == neighbor.position and n.f <= neighbor.f for n in open_set):
+                    heapq.heappush(open_set, neighbor)
+
+    return None  # No path found
+
+# Example grid: 0 = free, 1 = obstacle
+grid = [
+    [0, 1, 0, 0, 0],
+    [0, 1, 0, 1, 0],
+    [0, 0, 0, 1, 0],
+    [1, 1, 0, 0, 0],
+]
+
+start = (0, 0)
+end = (3, 4)
+path = a_star(grid, start, end)
+
+if path:
+    print("Path found:", path)
+else:
+    print("No path found.")

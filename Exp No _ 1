@@ -1,0 +1,87 @@
+import heapq
+
+# Directions: (row_offset, col_offset)
+moves = {
+    'up': (-1, 0),
+    'down': (1, 0),
+    'left': (0, -1),
+    'right': (0, 1)
+}
+
+def manhattan_distance(state, goal_state):
+    distance = 0
+    for i in range(3):
+        for j in range(3):
+            val = state[i][j]
+            if val != 0:
+                goal_x, goal_y = [(ix, iy) for ix in range(3) for iy in range(3) if goal_state[ix][iy] == val][0]
+                distance += abs(i - goal_x) + abs(j - goal_y)
+    return distance
+
+def get_neighbors(state):
+    neighbors = []
+    x, y = next((i, j) for i in range(3) for j in range(3) if state[i][j] == 0)
+
+    for move in moves.values():
+        new_x, new_y = x + move[0], y + move[1]
+        if 0 <= new_x < 3 and 0 <= new_y < 3:
+            new_state = [row[:] for row in state]
+            new_state[x][y], new_state[new_x][new_y] = new_state[new_x][new_y], new_state[x][y]
+            neighbors.append((new_state, 1))  # assuming each move costs 1
+    return neighbors
+
+def serialize(state):
+    return tuple(tuple(row) for row in state)
+
+def a_star(start, goal_state):
+    visited = set()
+    heap = []
+    heapq.heappush(heap, (manhattan_distance(start, goal_state), 0, start, []))
+
+    while heap:
+        est_total_cost, cost_so_far, state, path = heapq.heappop(heap)
+        if state == goal_state:
+            return path + [state], cost_so_far
+
+        serialized = serialize(state)
+        if serialized in visited:
+            continue
+        visited.add(serialized)
+
+        for neighbor, step_cost in get_neighbors(state):
+            if serialize(neighbor) not in visited:
+                new_path = path + [state]
+                new_cost = cost_so_far + step_cost
+                estimated_cost = new_cost + manhattan_distance(neighbor, goal_state)
+                heapq.heappush(heap, (estimated_cost, new_cost, neighbor, new_path))
+
+    return None, None
+
+def get_input_state(prompt):
+    print(f"Enter the {prompt} state row by row (use 0 for the blank tile):")
+    state = []
+    for i in range(3):
+        row = input(f"Row {i + 1} (space-separated): ").strip().split()
+        if len(row) != 3:
+            raise ValueError("Each row must contain exactly 3 numbers.")
+        state.append([int(x) for x in row])
+    return state
+
+# Get user input for initial and goal state
+try:
+    initial_state = get_input_state("initial")
+    goal_state = get_input_state("goal")
+    solution, total_cost = a_star(initial_state, goal_state)
+
+    # Print the steps
+    if solution:
+        for i, step in enumerate(solution):
+            print(f"Step {i}:")
+            for row in step:
+                print(row)
+            print()
+        print(f"Total cost to reach goal state: {total_cost}")
+    else:
+        print("No solution found.")
+except Exception as e:
+    print("Error:", e)

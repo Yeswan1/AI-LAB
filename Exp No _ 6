@@ -1,0 +1,57 @@
+def vacuum_cleaner():
+    # Get initial location
+    location = input("Enter initial location of vacuum cleaner (A or B): ").strip().upper()
+    while location not in ['A', 'B']:
+        location = input("Invalid input. Please enter A or B: ").strip().upper()
+    
+    # Get status of room A
+    status_A = input("Enter status of room A (Dirty or Clean): ").strip().lower()
+    while status_A not in ['dirty', 'clean']:
+        status_A = input("Invalid input. Please enter 'Dirty' or 'Clean' for room A: ").strip().lower()
+
+    # Get status of room B
+    status_B = input("Enter status of room B (Dirty or Clean): ").strip().lower()
+    while status_B not in ['dirty', 'clean']:
+        status_B = input("Invalid input. Please enter 'Dirty' or 'Clean' for room B: ").strip().lower()
+
+    print("\nStarting Vacuum Cleaner Simulation...\n")
+
+    if location == 'A':
+        if status_A == 'dirty':
+            print("Vacuum is in Room A. Room A is Dirty.")
+            print("=> Cleaning Room A.")
+            status_A = 'clean'
+        else:
+            print("Vacuum is in Room A. Room A is already Clean.")
+
+        print("=> Moving to Room B.")
+        if status_B == 'dirty':
+            print("Room B is Dirty.")
+            print("=> Cleaning Room B.")
+            status_B = 'clean'
+        else:
+            print("Room B is already Clean.")
+
+    elif location == 'B':
+        if status_B == 'dirty':
+            print("Vacuum is in Room B. Room B is Dirty.")
+            print("=> Cleaning Room B.")
+            status_B = 'clean'
+        else:
+            print("Vacuum is in Room B. Room B is already Clean.")
+
+        print("=> Moving to Room A.")
+        if status_A == 'dirty':
+            print("Room A is Dirty.")
+            print("=> Cleaning Room A.")
+            status_A = 'clean'
+        else:
+            print("Room A is already Clean.")
+
+    print("\nFinal Status:")
+    print(f"Room A: {status_A.capitalize()}")
+    print(f"Room B: {status_B.capitalize()}")
+    print("Vacuum Cleaner task completed.")
+
+# Run the vacuum cleaner simulation
+vacuum_cleaner()
