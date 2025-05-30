@@ -1,0 +1,14 @@
+% pattern_match(Pattern, Data)
+% Succeeds if Pattern matches the Data structure
+
+% Case 1: Empty pattern matches empty data
+pattern_match([], []).
+
+% Case 2: If heads match, recursively match tails
+pattern_match([H1|T1], [H2|T2]) :-
+    H1 = H2,
+    pattern_match(T1, T2).
+
+% Case 3: Wildcard match (underscore _ matches anything)
+pattern_match([_|T1], [_|T2]) :-
+    pattern_match(T1, T2).
